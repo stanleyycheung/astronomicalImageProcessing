@@ -145,18 +145,24 @@ class Processor:
         excluder_circle([(946+1008)/2, (2814+2741)/2], (1008-946)/2 + 7)
         excluder_circle([(876+942)/2, (2321+2259)/2], (942-876)/2 + 7)
 
-        excluder(1420, 5, 1450, 4604)  # large blooming line
+        excluder(1420, 5, 1450, 4610)  # large blooming line
 
-        excluder(1027, 425, 1045, 452)  # small cross
+        excluder(1027, 424, 1045, 452)  # small cross
         excluder(1639, 333, 1650, 356)  # small L
-
+        # first bloom
         excluder(1100, 426, 1649, 233)
         excluder(1295, 434, 1544, 459)
+        excluder(1418, 459, 1452, 466)
         # 2nd bloom from top
         excluder(1020, 314, 1701, 330)
         excluder(1382, 330, 1511, 370)
         # 3rd bloom
         excluder(1389, 217, 1475, 264)
+        # 4th bloom
+        excluder(1285, 114, 1541, 159)
+        # bottom bloom
+        excluder(1137, 3, 1615, 23)
+        excluder(1333, 13, 1512, 40)
 
     def createFile(self):
         self.imgMasked = np.zeros(self.img.shape)
