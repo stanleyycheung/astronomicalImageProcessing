@@ -51,7 +51,7 @@ class Processor:
         for i in range(len(self.img)):
             for j in range(len(self.img[0])):
                 self.greyAreaExclude(i, j)
-                if self.img[i][j] >= 50000:
+                if self.img[i][j] >= 48000:
                     self.mask[i][j] = False
                 else:
                     continue
@@ -147,6 +147,17 @@ class Processor:
 
         excluder(1420, 5, 1450, 4604)  # large blooming line
 
+        excluder(1027, 425, 1045, 452)  # small cross
+        excluder(1639, 333, 1650, 356)  # small L
+
+        excluder(1100, 426, 1649, 233)
+        excluder(1295, 434, 1544, 459)
+        # 2nd bloom from top
+        excluder(1020, 314, 1701, 330)
+        excluder(1382, 330, 1511, 370)
+        # 3rd bloom
+        excluder(1389, 217, 1475, 264)
+
     def createFile(self):
         self.imgMasked = np.zeros(self.img.shape)
         self.imgMasked[self.mask] = self.img[self.mask]
@@ -169,10 +180,10 @@ class Processor:
 
 if __name__ == '__main__':
     p = Processor()
-    # p.createMask()
-    p.readMask()
+    p.createMask()
+    # p.readMask()
     # p.fitBackground(p.imgMasked)
-    p.plotBackground(p.imgMasked)
+    # p.plotBackground(p.imgMasked)
     # p.plotBackground(p.img)
     plt.show()
 
