@@ -11,12 +11,12 @@ from scipy import stats
 class Analyzer:
     def __init__(self):
         self.mask = np.load('mask.npy')
-        self.testImg = np.load('testData_bigger.npy')
+        self.testImg = np.load('testData_bigger.npy') #from maketestdata
         self.imgMasked = np.load('imgMasked.npy')
 
-        self.background = 3412
-        self.sigma = 20
-        self.ZP = 25.3
+        self.background = 3412 #mean of gaussian
+        self.sigma = 20 #spread
+        self.ZP = 25.3 #zeropoint ZP
         self.threshold = self.background + 5 * self.sigma
 
         self.galaxies_points = []
@@ -25,17 +25,17 @@ class Analyzer:
     def run(self):
         """Run code"""
         self.labelGalaxies(self.testImg)
-        self.calcGalaxies(self.testImg, self.digitalMap)
+        self.calcGalaxies(self.testImg, self.digitalMap) #digital map: creating catalog
         print(self.galaxies)
-        self.test()
+        self.test() #plot digital graph
         self.plotTestImg(self.testImg)
         # print(self.galaxies_points[-2])
 
     def labelGalaxies(self, data):
         """Creates a digital map and clusters galaxies together
-        Puts the galaxies into galaxy_points"""
-        self.digitalMap = data > self.threshold
-        self.digitalMap = np.asarray(self.digitalMap, dtype=np.int32)
+        Puts the galaxies into galaxy_points""" #above threshold = 1, rest =0
+        self.digitalMap = data > self.threshold #in True or False
+        self.digitalMap = np.asarray(self.digitalMap, dtype=np.int32) #Convert into 0 or 1
         print(f'threshold = {self.threshold}')
 
         for i in range(len(self.digitalMap)):
@@ -52,7 +52,7 @@ class Analyzer:
             size = 0
             for point in galaxy:
                 # print(point, data[point[0], point[1]])
-                pixel_count += data[point[0], point[1]]
+                pixel_count += data[point[0], point[1]] #each are x and y coordinate of the point
                 if point[0] < x_min:
                     x_min = point[0]
                 elif point[0] > x_max:
@@ -74,21 +74,15 @@ class Analyzer:
             self.galaxies.append(galaxy)
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
-        """Finds the background value by drawing a big circle around star
-        Values:
-        0 - no star - background
-        1 - star but not grouped
-        2 - star but grouped
-        3 - no star - background but chosen in find background
-        """
+        """Finds the background value by drawing a big circle around star"""
         xlower = max(int(x_mid - radius), 0)
         xhigher = max(int(x_mid + radius), 0)
         ylower = max(int(y_mid - radius), 0)
-        yhigher = max(int(y_mid + radius), 0)
+        yhigher = max(int(y_mid + radius), 0) #make square
         background_arr = []
         for row in range(xlower, xhigher + 1, 1):
             for column in range(ylower, yhigher + 1, 1):
-                try:
+                try: #make circular aperture out of it
                     if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2 and (digitalMap[row][column] == 0 or digitalMap[row][column] == 3):
                         background_arr.append(data[row][column])
                         digitalMap[row][column] = 3
@@ -115,7 +109,7 @@ class Analyzer:
     def floodFill(self, x, y):
         """Calculates points that are clustered together"""
         size_threshold = 2
-        object = []
+        object = [] #list of points of one galaxy detected
         size = 0
         toFill = set()
         toFill.add((x, y))
@@ -145,7 +139,7 @@ class Analyzer:
             except IndexError:
                 pass
         if size > size_threshold:
-            self.galaxies_points.append(object)
+            self.galaxies_points.append(object) #arrays in array: list of objects
         else:
             for x, y in object:
                 self.digitalMap[x, y] = 0
