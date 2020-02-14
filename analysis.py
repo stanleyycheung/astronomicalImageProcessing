@@ -39,6 +39,7 @@ class Analyzer:
         self.write()
         self.plotDigital()  # plot digital graph
         self.plotData(self.testImg)
+        np.save('galaxies_points', self.galaxies_points)
 
     def labelGalaxies(self, data):
         """Creates a digital map and clusters galaxies together
@@ -160,14 +161,14 @@ class Analyzer:
     def plotDigital(self):
         fig, ax = plt.subplots()
         cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow'])
-        plt.imshow(self.digitalMap, cmap=cmap)
+        plt.imshow(self.digitalMap, cmap=cmap, origin='lower')
 
         # plt.hist(data)
         # plt.show()
 
     def plotData(self, data):
         fig, ax = plt.subplots()
-        plt.imshow(data, norm=LogNorm())
+        plt.imshow(data, norm=LogNorm(), origin='lower')
         plt.colorbar()
 
 

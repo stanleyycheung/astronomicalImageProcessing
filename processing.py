@@ -164,15 +164,15 @@ class Processor:
         excluder(1137, 3, 1615, 23)
         excluder(1333, 13, 1512, 40)
 
-        #star bloom 1 to 8
-        excluder(772,3376,777,3418) #1
-        excluder(772,3203,779,3727) #2
-        excluder(2132,3792,2135,3803) #3
-        excluder(2131,3708,2137,3732) #4
-        excluder(969,2816,977,2836) #5
-        excluder(964,2704,977,2741) #6
-        excluder(903,2230,909,2357) #7
-        excluder(902,2223,909,2251) #8
+        # star bloom 1 to 8
+        excluder(772, 3376, 777, 3418)  # 1
+        excluder(772, 3203, 779, 3727)  # 2
+        excluder(2132, 3792, 2135, 3803)  # 3
+        excluder(2131, 3708, 2137, 3732)  # 4
+        excluder(969, 2816, 977, 2836)  # 5
+        excluder(964, 2704, 977, 2741)  # 6
+        excluder(903, 2230, 909, 2357)  # 7
+        excluder(902, 2223, 909, 2251)  # 8
 
     def createFile(self):
         self.imgMasked = np.zeros(self.img.shape)
