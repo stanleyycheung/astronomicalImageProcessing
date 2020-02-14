@@ -24,6 +24,7 @@ class Analyzer:
         # self.mask = np.load('mask.npy')
         self.testImg = testImgFile  # from maketestdata
         # self.imgMasked = np.load('imgMasked.npy')
+        # load blooming data
 
     def run(self):
         """Run code"""
@@ -74,6 +75,7 @@ class Analyzer:
             x_mid, y_mid = (x_max + x_min)/2, (y_max + y_min)/2
             # print(x_mid, y_mid)
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
+            self.clipper(size)
             background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
             real_count = pixel_count - background * size
             mag_i = -2.5 * np.log10(real_count)
@@ -81,6 +83,19 @@ class Analyzer:
             galaxy = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
                       'total_count': pixel_count, 'background_count': background * size}
             self.galaxies.append(galaxy)
+
+    def clipper(self, size):
+        patches = np.load('clipper.npy')
+        circle = patches[0]
+        square = patches[1]
+
+        #method 1: compare distance to blooming region and radius
+        radius = np.sqrt(size/np.pi)
+
+
+        for
+        pass
+
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
@@ -161,7 +176,6 @@ class Analyzer:
         fig, ax = plt.subplots()
         cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow'])
         plt.imshow(self.digitalMap, cmap=cmap)
-
         # plt.hist(data)
         # plt.show()
 
