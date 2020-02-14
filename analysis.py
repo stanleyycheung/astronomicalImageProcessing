@@ -90,13 +90,11 @@ class Analyzer:
         circle = patches[0]
         square = patches[1]
 
-        #method 1: compare distance to blooming region and radius
+        # method 1: compare distance to blooming region and radius
         radius = np.sqrt(size/np.pi)
-
 
         for
         pass
-
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
@@ -176,12 +174,8 @@ class Analyzer:
     def plotDigital(self):
         fig, ax = plt.subplots()
         cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow'])
-<<<<<<< HEAD
         plt.imshow(self.digitalMap, cmap=cmap, origin='lower')
 
-=======
-        plt.imshow(self.digitalMap, cmap=cmap)
->>>>>>> 658f64137b6386ddf86331ec303dc7b412fe200b
         # plt.hist(data)
         # plt.show()
 

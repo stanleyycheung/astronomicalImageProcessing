@@ -139,70 +139,33 @@ class Processor:
         # excluder(946, 2741, 1008, 2814)  # left center star
         # excluder(876, 2259, 942, 2321)  # left center star
 
-<<<<<<< HEAD
-        excluder_circle([(820+735)/2, (3367+3284)/2], (820-735)/2 + 7)
-        excluder_circle([(1248+1623)/2, (3046+3410)/2], (3410-3046)/2 + 10)
-        excluder_circle([(2112+2159)/2, (3787+3736)/2], (2159-2112)/2 + 7)
-        excluder_circle([(946+1008)/2, (2814+2741)/2], (1008-946)/2 + 7)
-        excluder_circle([(876+942)/2, (2321+2259)/2], (942-876)/2 + 7)
+        circle = np.array([[[(820+735)/2, (3367+3284)/2], (820-735)/2 + 7], [[(1248+1623)/2, (3046+3410)/2], (3410-3046)/2 + 40],
+                           [[(2112+2159)/2, (3787+3736)/2], (2159-2112)/2 +
+                            7], [[(946+1008)/2, (2814+2741)/2], (1008-946)/2 + 7],
+                           [[(876+942)/2, (2321+2259)/2], (942-876)/2 + 7]])
 
-        excluder(1420, 5, 1450, 4610)  # large blooming line
-
-        excluder(1027, 424, 1045, 452)  # small cross
-        excluder(1639, 333, 1650, 356)  # small L
-        # first bloom
-        excluder(1100, 426, 1649, 233)
-        excluder(1295, 434, 1544, 459)
-        excluder(1418, 459, 1452, 466)
-        # 2nd bloom from top
-        excluder(1020, 314, 1701, 330)
-        excluder(1382, 330, 1511, 370)
-        # 3rd bloom
-        excluder(1389, 217, 1475, 264)
-        # 4th bloom
-        excluder(1285, 114, 1541, 159)
-        # bottom bloom
-        excluder(1137, 3, 1615, 23)
-        excluder(1333, 13, 1512, 40)
-
-        # star bloom 1 to 8
-        excluder(772, 3376, 777, 3418)  # 1
-        excluder(772, 3203, 779, 3727)  # 2
-        excluder(2132, 3792, 2135, 3803)  # 3
-        excluder(2131, 3708, 2137, 3732)  # 4
-        excluder(969, 2816, 977, 2836)  # 5
-        excluder(964, 2704, 977, 2741)  # 6
-        excluder(903, 2230, 909, 2357)  # 7
-        excluder(902, 2223, 909, 2251)  # 8
-=======
-        circle = np.array([[[(820+735)/2, (3367+3284)/2], (820-735)/2 + 7],[[(1248+1623)/2, (3046+3410)/2], (3410-3046)/2 + 40],
-                            [[(2112+2159)/2, (3787+3736)/2], (2159-2112)/2 + 7],[[(946+1008)/2, (2814+2741)/2], (1008-946)/2 + 7],
-                            [[(876+942)/2, (2321+2259)/2], (942-876)/2 + 7]])
-
-        square = np.array([[1420, 5, 1450, 4610],[1027, 424, 1045, 452],
-                        [1639, 333, 1650, 356],[1100, 426, 1649, 233],
-                        [1295, 434, 1544, 459],[1418, 459, 1452, 466],
-                        [1020, 314, 1701, 330],[1382, 330, 1511, 370],
-                        [1389, 217, 1475, 264],[1285, 114, 1541, 159],
-                        [1137, 3, 1615, 23],[1333, 13, 1512, 40],
-                        [772,3376,777,3418],[772,3203,779,3283],
-                        [2132,3792,2135,3803],[2131,3708,2137,3732],
-                        [969,2816,977,2836],[964,2704,977,2741],
-                        [902,2230,909,2357],[901,2223,909,2251]])
+        square = np.array([[1420, 5, 1450, 4610], [1027, 424, 1045, 452],
+                           [1639, 333, 1650, 356], [1100, 426, 1649, 233],
+                           [1295, 434, 1544, 459], [1418, 459, 1452, 466],
+                           [1020, 314, 1701, 330], [1382, 330, 1511, 370],
+                           [1389, 217, 1475, 264], [1285, 114, 1541, 159],
+                           [1137, 3, 1615, 23], [1333, 13, 1512, 40],
+                           [772, 3376, 777, 3418], [772, 3203, 779, 3283],
+                           [2132, 3792, 2135, 3803], [2131, 3708, 2137, 3732],
+                           [969, 2816, 977, 2836], [964, 2704, 977, 2741],
+                           [902, 2230, 909, 2357], [901, 2223, 909, 2251]])
 
         for patch in circle:
             # print(patch[0],patch[1])
-            excluder_circle(patch[0],patch[1])
-
+            excluder_circle(patch[0], patch[1])
 
         for patch in square:
-            excluder(patch[0],patch[1],patch[2],patch[3])
+            excluder(patch[0], patch[1], patch[2], patch[3])
             # print(patch[0],patch[1],patch[2],patch[3])
 
-        clipper = [circle,square]
-        np.save('clipper.npy',clipper)
-        #print(clipper)
-
+        clipper = [circle, square]
+        np.save('clipper.npy', clipper)
+        # print(clipper)
 
         # excluder_circle([(820+735)/2, (3367+3284)/2], (820-735)/2 + 7)
         # excluder_circle([(1248+1623)/2, (3046+3410)/2], (3410-3046)/2 + 10)
@@ -240,9 +203,7 @@ class Processor:
         # excluder(902,2223,909,2251) #8
 
         # np.save
-        #2d list: one is circle and one is square
-
->>>>>>> 658f64137b6386ddf86331ec303dc7b412fe200b
+        # 2d list: one is circle and one is square
 
     def createFile(self):
         self.imgMasked = np.zeros(self.img.shape)
@@ -266,9 +227,9 @@ class Processor:
 
 if __name__ == '__main__':
     p = Processor()
-    #p.starsExclude()
+    # p.starsExclude()
     p.createMask()
-    #p.readMask()
+    # p.readMask()
     # p.fitBackground(p.imgMasked)
     # p.plotBackground(p.imgMasked)
     # p.plotBackground(p.img)
