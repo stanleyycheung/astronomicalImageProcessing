@@ -12,7 +12,7 @@ from matplotlib.colors import LogNorm
 
 mData = fits.open('masked1.fits')[0].data
 print(mData.shape)
-testData = mData[3700:4604, 4:1121]
+testData = mData[3400:4604, 4:1500]
 np.save('testData_noisy', testData)
 
 fig, ax = plt.subplots()

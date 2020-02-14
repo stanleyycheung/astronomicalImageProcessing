@@ -1,35 +1,44 @@
 import matplotlib.pyplot as plt
-from processing import Processor
 from matplotlib import colors
 import numpy as np
 from matplotlib.colors import LogNorm
 from scipy import stats
-
+from pprint import pprint
+import time
+import json
 # https://en.wikipedia.org/wiki/Sersic_profile
 
 
 class Analyzer:
     def __init__(self):
-        self.mask = np.load('mask.npy')
-        self.testImg = np.load('testData_bigger.npy')  # from maketestdata
-        self.imgMasked = np.load('imgMasked.npy')
-
         self.background = 3412  # mean of gaussian
         self.sigma = 20  # spread
         self.ZP = 25.3  # zeropoint ZP
-        self.threshold = self.background + 5 * self.sigma
+        self.sigma_num = 3
+        self.threshold = self.background + self.sigma_num * self.sigma
 
         self.galaxies_points = []
         self.galaxies = []
 
+    def load(self, testImgFile):
+        # self.mask = np.load('mask.npy')
+        self.testImg = testImgFile  # from maketestdata
+        # self.imgMasked = np.load('imgMasked.npy')
+
     def run(self):
         """Run code"""
+        t1 = time.process_time()
         self.labelGalaxies(self.testImg)
+        t2 = time.process_time()
+        print(f'Took {t2-t1:.2f}s to label galaxies')
         self.calcGalaxies(self.testImg, self.digitalMap)  # digital map: creating catalog
-        print(self.galaxies)
-        self.test()  # plot digital graph
-        self.plotTestImg(self.testImg)
-        # print(self.galaxies_points[-2])
+        t3 = time.process_time()
+        print(f'Took {t3-t2:.2f}s to calculate galaxies')
+        # pprint(self.galaxies)
+        print(f'No. of galaxies = {len(self.galaxies)}')
+        self.write()
+        self.plotDigital()  # plot digital graph
+        self.plotData(self.testImg)
 
     def labelGalaxies(self, data):
         """Creates a digital map and clusters galaxies together
@@ -144,7 +153,11 @@ class Analyzer:
             for x, y in object:
                 self.digitalMap[x, y] = 0
 
-    def test(self):
+    def write(self):
+        with open('galaxies.json', 'w') as fout:
+            json.dump(self.galaxies, fout)
+
+    def plotDigital(self):
         fig, ax = plt.subplots()
         cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow'])
         plt.imshow(self.digitalMap, cmap=cmap)
@@ -152,7 +165,7 @@ class Analyzer:
         # plt.hist(data)
         # plt.show()
 
-    def plotTestImg(self, data):
+    def plotData(self, data):
         fig, ax = plt.subplots()
         plt.imshow(data, norm=LogNorm())
         plt.colorbar()
@@ -160,6 +173,7 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
+    a.load(np.load('testData_noisy.npy'))
     a.run()
     plt.show()
-    # a.plotTestImg()
+    # a.plotData()
