@@ -11,9 +11,12 @@ from matplotlib.colors import LogNorm
 # testData = pixelData[2240:2631, 1574:1790]  # bigger slice
 
 mData = fits.open('masked1.fits')[0].data
+orgWindow = fits.open('A1_mosaic.fits')[0].data
 print(mData.shape)
 testData = mData[3400:4604, 4:1500]
+orgData = orgWindow[3400:4604, 4:1500]
 np.save('testData_noisy', testData)
+np.save('orgData_noisy', orgData)
 
 fig, ax = plt.subplots()
 plt.imshow(testData, norm=LogNorm(), origin='lower')
