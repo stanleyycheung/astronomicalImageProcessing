@@ -41,7 +41,7 @@ class Processor:
         m, s = stats.norm.fit(background)  # get mean and standard deviation
         print(m, s)
         pdf_g = stats.norm.pdf(lnspc, m, s)  # now get theoretical values in our interval
-        plt.plot(lnspc, pdf_g)#, label=f"Norm, mean = {m:.2f}")  # plot it
+        plt.plot(lnspc, pdf_g, label=f"Norm, mean = {m:.2f}")  # plot it
         plt.legend(loc=1)
         plt.savefig('background_aftercorrection.png')
 
