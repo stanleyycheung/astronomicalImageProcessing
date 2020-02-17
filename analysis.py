@@ -20,9 +20,10 @@ class Analyzer:
         self.galaxies_points = []
         self.galaxies = []
 
-    def load(self, testImgFile):
+    def load(self, testImgFile, orgImgFile):
         # self.mask = np.load('mask.npy')
         self.testImg = testImgFile  # from maketestdata
+        self.orgImg = orgImgFile
         # self.imgMasked = np.load('imgMasked.npy')
         # load blooming data
 
@@ -57,6 +58,8 @@ class Analyzer:
     def calcGalaxies(self, data, digitalMap):
         """Calculates the fluxes from galaxy_points"""
         interval = len(self.galaxies_points)//100
+        differences = []
+        clip_counter = 0
         for i, galaxy in enumerate(np.array(self.galaxies_points)):
             pixel_count = 0
             x_min, x_max = 1e9, 0
@@ -75,33 +78,72 @@ class Analyzer:
                     y_max = point[1]
                 size += 1
             x_mid, y_mid = (x_max + x_min)/2, (y_max + y_min)/2
+            radius = max((x_max-x_mid), (x_mid-x_min), (y_max-y_mid), (y_mid-y_min))
+
             # print(x_mid, y_mid)
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
-            # self.clipper(size)
-            background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
-            real_count = pixel_count - background * size
-            mag_i = -2.5 * np.log10(real_count)
-            m = self.ZP + mag_i
-            galaxy = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
-                      'total_count': pixel_count, 'background_count': background * size}
-            self.galaxies.append(galaxy)
+            if self.clipper(x_mid, y_mid, radius, differences, data, clip_counter):
+                background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
+                real_count = pixel_count - background * size
+                mag_i = -2.5 * np.log10(real_count)
+                m = self.ZP + mag_i
+                galaxy_dict = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
+                               'total_count': pixel_count, 'background_count': background * size}
+                self.galaxies.append(galaxy_dict)
             if i % interval == 0:
                 print(f'Galaxy {i} out of {len(self.galaxies_points)}')
+        # access differences here
+        fig, ax = plt.subplots()
+        plt.hist(differences, bins='auto')
+        plt.xlabel('difference in number of counts')
+        plt.ylabel('number of entries')
+        plt.title('difference plot - find threshold')
 
-    # def clipper(self, size):
-    #     patches = np.load('clipper.npy')
-    #     circle = patches[0]
-    #     square = patches[1]
-    #
-    #     #method 1: compare distance to blooming region and radius
-    #     radius = np.sqrt(size/np.pi)
-    #
-    #
-    #
-    #     for
-    #     pass
+        print("Number of clipped galaxies = ", clip_counter)
 
-    def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
+    def clipper(self, x_mid, y_mid, radius, differences, data, counter):
+        # patches = np.load('clipper.npy')
+        # circle = patches[0]
+        # square = patches[1]
+
+        # method 1: compare distance to blooming region and radius
+        # radius = np.sqrt(size/np.pi)
+        xlower = max(int(x_mid - radius), 0)
+        ylower = max(int(y_mid - radius), 0)
+        xhigher = int(x_mid + radius)
+        yhigher = int(y_mid + radius)
+
+        orig_count = []
+        mask_count = []  # try to eliminate these two later on
+        for row in range(xlower, xhigher + 1, 1):
+            for column in range(ylower, yhigher + 1, 1):
+                try:  # make circular aperture out of it
+                    if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2:
+                        orig_count.append(self.orgImg[row][column])
+                        mask_count.append(data[row][column])
+                        # print(row, column)
+                except IndexError:
+                    pass
+
+        orig_tot = np.sum(orig_count)
+        mask_tot = np.sum(mask_count)
+        differences.append(abs(orig_tot-mask_tot))
+        if abs(orig_tot-mask_tot) == 0:
+            return True
+        else:
+            print('cut galaxy has midpoints', x_mid, ',', y_mid, 'radius is', radius)
+            counter += 1
+            return False
+
+
+>>>>>> > pr/7
+   #
+   #
+   #
+   #     for
+   #     pass
+
+   def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
         xlower = max(int(x_mid - radius), 0)
         xhigher = max(int(x_mid + radius), 0)
@@ -194,8 +236,12 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
-    a.load(np.load('testData_noisy.npy'))
+<<<<<< < HEAD
+   a.load(np.load('testData_noisy.npy'))
     # a.load(np.load('realmaskedData.npy'))
-    a.run()
+== =====
+    a.load(np.load('testData_noisy.npy'), np.load('orgData_noisy.npy'))
+>>>>>> > pr/7
+   a.run()
     plt.show()
     # a.plotData()
