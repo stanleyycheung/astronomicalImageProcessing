@@ -93,7 +93,6 @@ class Analyzer:
         # method 1: compare distance to blooming region and radius
         radius = np.sqrt(size/np.pi)
 
-        for
         pass
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
