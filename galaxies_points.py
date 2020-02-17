@@ -4,7 +4,7 @@ from scipy.signal import find_peaks, peak_prominences
 
 
 def galaxyDistribution(galaxies_points, img):
-    for counter in range(500):
+    for counter in range(len(galaxies_points)):
         galaxy = galaxies_points[counter]
         x_min, x_max = 1e9, 0
         y_min, y_max = 1e9, 0
@@ -18,12 +18,16 @@ def galaxyDistribution(galaxies_points, img):
             elif point[1] > y_max:
                 y_max = point[1]
 
-        buffer = 2
+        buffer = 3
+
         x_min = max(int(x_min-buffer), 0)
-        x_max = min(int(x_max+buffer), img.shape[1])
+        # x_max = min(int(x_max+buffer), img.shape[1] - 1)
         y_min = max(int(y_min-buffer), 0)
-        # y_max = min(int(y_max+buffer), img.shape[0])
-        # print(x_min, x_max, y_min, y_max)
+        # y_max = min(int(y_max+buffer), img.shape[0] - 1)
+        if x_min == x_max or y_min == y_max:
+            np.delete(galaxies_points, counter)
+            # print(x_min, x_max, y_min, y_max)
+            continue
 
         y_counts = []
         for i in range(x_min, x_max):
@@ -39,8 +43,8 @@ def galaxyDistribution(galaxies_points, img):
         x_counts = np.sum(x_counts, axis=0)
         pos_x = np.arange(x_min, x_max+1)
 
-        if len(y_counts) == 0 or len(x_counts) == 0:
-            raise ValueError(f'{x_min, x_max, y_min, y_max}')
+        # if len(y_counts) == 0 or len(x_counts) == 0:
+        #     raise ValueError(f'{x_min, x_max, y_min, y_max}')
 
         y_diff = np.sort(np.diff(y_counts))
         x_diff = np.sort(np.diff(x_counts))

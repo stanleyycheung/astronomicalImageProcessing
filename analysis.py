@@ -56,7 +56,8 @@ class Analyzer:
 
     def calcGalaxies(self, data, digitalMap):
         """Calculates the fluxes from galaxy_points"""
-        for galaxy in np.array(self.galaxies_points):
+        interval = len(self.galaxies_points)//100
+        for i, galaxy in enumerate(np.array(self.galaxies_points)):
             pixel_count = 0
             x_min, x_max = 1e9, 0
             y_min, y_max = 1e9, 0
@@ -84,6 +85,8 @@ class Analyzer:
             galaxy = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
                       'total_count': pixel_count, 'background_count': background * size}
             self.galaxies.append(galaxy)
+            if i % interval == 0:
+                print(f'Galaxy {i} out of {len(self.galaxies_points)}')
 
     # def clipper(self, size):
     #     patches = np.load('clipper.npy')
@@ -140,6 +143,8 @@ class Analyzer:
         toFill.add((x, y))
         while toFill:
             (x, y) = toFill.pop()
+            if x < 0 or y < 0:
+                continue
             object.append([x, y])
             self.digitalMap[x, y] = 2
             size += 1
@@ -190,6 +195,7 @@ class Analyzer:
 if __name__ == '__main__':
     a = Analyzer()
     a.load(np.load('testData_noisy.npy'))
+    # a.load(np.load('realmaskedData.npy'))
     a.run()
     plt.show()
     # a.plotData()

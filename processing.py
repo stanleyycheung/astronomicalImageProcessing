@@ -41,7 +41,7 @@ class Processor:
         m, s = stats.norm.fit(background)  # get mean and standard deviation
         print(m, s)
         pdf_g = stats.norm.pdf(lnspc, m, s)  # now get theoretical values in our interval
-        plt.plot(lnspc, pdf_g)#, label=f"Norm, mean = {m:.2f}")  # plot it
+        plt.plot(lnspc, pdf_g)  # , label=f"Norm, mean = {m:.2f}")  # plot it
         plt.legend(loc=1)
         plt.savefig('background_aftercorrection.png')
 
@@ -153,7 +153,7 @@ class Processor:
                            [772, 3376, 777, 3418], [772, 3203, 779, 3283],
                            [2132, 3792, 2135, 3803], [2131, 3708, 2137, 3732],
                            [969, 2816, 977, 2836], [964, 2704, 977, 2741],
-                           [902, 2230, 909, 2357], [901, 2223, 909, 2251]])
+                           [902, 2230, 909, 2357], [901, 2223, 909, 2251], [1102, 424, 1652, 442]])
 
         for patch in circle:
             # print(patch[0],patch[1])
