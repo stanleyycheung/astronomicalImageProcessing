@@ -135,15 +135,7 @@ class Analyzer:
             counter += 1
             return False
 
-
->>>>>> > pr/7
-   #
-   #
-   #
-   #     for
-   #     pass
-
-   def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
+    def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
         xlower = max(int(x_mid - radius), 0)
         xhigher = max(int(x_mid + radius), 0)
@@ -236,12 +228,7 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
-<<<<<< < HEAD
-   a.load(np.load('testData_noisy.npy'))
-    # a.load(np.load('realmaskedData.npy'))
-== =====
     a.load(np.load('testData_noisy.npy'), np.load('orgData_noisy.npy'))
->>>>>> > pr/7
-   a.run()
+    a.run()
     plt.show()
     # a.plotData()

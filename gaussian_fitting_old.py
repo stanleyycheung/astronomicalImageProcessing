@@ -1,41 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import optimize
+from scipy.optimize import curve_fit
+
 # unfinished 18/02
 
 
-def gaussian(height, center_x, center_y, width_x, width_y):
-    """Returns a gaussian function with the given parameters"""
-    width_x = float(width_x)
-    width_y = float(width_y)
-    return lambda x, y: height*np.exp(
-        -(((center_x-x)/width_x)**2+((center_y-y)/width_y)**2)/2)
-
-
-def moments(data):
-    """Returns (height, x, y, width_x, width_y)
-    the gaussian parameters of a 2D distribution by calculating its
-    moments """
-    total = data.sum()
-    X, Y = np.indices(data.shape)
-    x = (X*data).sum()/total
-    y = (Y*data).sum()/total
-    col = data[:, int(y)]
-    width_x = np.sqrt(np.abs((np.arange(col.size)-y)**2*col).sum()/col.sum())
-    row = data[int(x), :]
-    width_y = np.sqrt(np.abs((np.arange(row.size)-x)**2*row).sum()/row.sum())
-    height = data.max()
-    return height, x, y, width_x, width_y
-
-
-def fitgaussian(data):
-    """Returns (height, x, y, width_x, width_y)
-    the gaussian parameters of a 2D distribution found by a fit"""
-    params = moments(data)
-    def errorfunction(p): return np.ravel(gaussian(*p)(*np.indices(data.shape)) -
-                                          data)
-    p, success = optimize.leastsq(errorfunction, params)
-    return p
+def twoD_Gaussian(xdata_tuple, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+    (x, y) = xdata_tuple
+    xo = float(xo)
+    yo = float(yo)
+    a = (np.cos(theta)**2)/(2*sigma_x**2) + (np.sin(theta)**2)/(2*sigma_y**2)
+    b = -(np.sin(2*theta))/(4*sigma_x**2) + (np.sin(2*theta))/(4*sigma_y**2)
+    c = (np.sin(theta)**2)/(2*sigma_x**2) + (np.cos(theta)**2)/(2*sigma_y**2)
+    g = offset + amplitude*np.exp(- (a*((x-xo)**2) + 2*b*(x-xo)*(y-yo)
+                                     + c*((y-yo)**2)))
+    return g.ravel()
 
 
 def gaussian_fitting(galaxies_points, img):
@@ -66,11 +45,11 @@ def gaussian_fitting(galaxies_points, img):
         y = np.arange(y_min, y_max, 1)
         x, y = np.meshgrid(y, x)
         img_slice = img[x_min:x_max, y_min:y_max]
-        params = fitgaussian(img_slice)
-        fit = gaussian(*params)
+        popt, pcov = curve_fit(twoD_Gaussian, (x, y), img_slice.ravel(),
+                               p0=[100, 200, 6, 1, 1, 0, 3000])
+        print(popt)
         fig, ax = plt.subplots()
         plt.imshow(img_slice, origin='upper')
-        plt.contour(fit(*np.indices(img_slice.shape)))
         # ax.contour(x, y, twoD_Gaussian((x, y), *popt).reshape(7, 12), 1, colors='w')
 
 
