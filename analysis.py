@@ -66,9 +66,15 @@ class Analyzer:
             x_min, x_max = 1e9, 0
             y_min, y_max = 1e9, 0
             size = 0
+            brightestValue = 0
+            brightestPoint = [0, 0]
             for point in galaxy:
                 # print(point, data[point[0], point[1]])
                 pixel_count += data[point[0], point[1]]  # each are x and y coordinate of the point
+                brightness = data[point[0], point[1]]
+                if brightness > brightestValue:
+                    brightestValue = brightness
+                    brightestPoint = point
                 if point[0] < x_min:
                     x_min = point[0]
                 elif point[0] > x_max:
@@ -83,7 +89,7 @@ class Analyzer:
 
             # print(x_mid, y_mid)
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
-            if self.clipper(x_mid, y_mid, radius, differences, data):
+            if self.clipper(x_mid, y_mid, radius, differences, data) and self.asymmetry(x_min,x_max,y_min,y_max,brightestPoint[0],brightestPoint[1]):
                 background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
                 real_count = pixel_count - background * size
                 mag_i = -2.5 * np.log10(real_count)
@@ -95,12 +101,22 @@ class Analyzer:
                 print(f'Galaxy {i} out of {len(self.galaxies_points)}')
         # access differences here
         fig, ax = plt.subplots()
-        plt.hist(differences, bins='auto')
+        np.save('differences.npy', differences)
+        plt.hist(differences, bins=40)
         plt.xlabel('difference in number of counts')
         plt.ylabel('number of entries')
         plt.title('difference plot - find threshold')
 
         print("Number of clipped galaxies = ", self.clip_counter)
+
+    def asymmetry(self, x_min, x_max, y_min, y_max, bP0, bP1):
+        x_diff = abs((x_max-bP0)-(bP0-x_min)) #difference in the distance to brightest point from xmin and xmax\
+        y_diff = abs((y_max-bP1)-(bP1-y_min))
+
+        if y_diff > 5 or x_diff > 5:
+            return False
+        else:
+            return True
 
     def clipper(self, x_mid, y_mid, radius, differences, data):
         # patches = np.load('clipper.npy')
@@ -134,7 +150,7 @@ class Analyzer:
         else:
             print('cut galaxy has midpoints', x_mid, ',', y_mid, 'radius is', radius)
             self.clip_counter += 1
-            return True
+            return False
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
@@ -229,7 +245,7 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
-    a.load('testData_noisy.npy', 'orgData_noisy.npy')
+    a.load('testData_noisy.npy', 'orgtestData_noisy.npy')
     a.run()
     plt.show()
     # a.plotData()

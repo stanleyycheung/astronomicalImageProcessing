@@ -39,7 +39,7 @@ def fitgaussian(data):
 
 
 def gaussian_fitting(galaxies_points, img):
-    for counter in range(10):
+    for counter in range(5):
         galaxy = galaxies_points[counter]
         x_min, x_max = 1e9, 0
         y_min, y_max = 1e9, 0
@@ -52,7 +52,7 @@ def gaussian_fitting(galaxies_points, img):
                 y_min = point[1]
             elif point[1] > y_max:
                 y_max = point[1]
-        buffer = 3
+        buffer = 0
         x_min = max(int(x_min-buffer), 0)
         # x_max = min(int(x_max+buffer), img.shape[1] - 1)
         y_min = max(int(y_min-buffer), 0)
