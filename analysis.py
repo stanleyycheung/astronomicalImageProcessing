@@ -59,7 +59,7 @@ class Analyzer:
         """Calculates the fluxes from galaxy_points"""
         interval = len(self.galaxies_points)//100
         differences = []
-        clip_counter = 0
+        self.clip_counter = 0
         for i, galaxy in enumerate(np.array(self.galaxies_points)):
             pixel_count = 0
             x_min, x_max = 1e9, 0
@@ -82,7 +82,7 @@ class Analyzer:
 
             # print(x_mid, y_mid)
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
-            if self.clipper(x_mid, y_mid, radius, differences, data, clip_counter):
+            if self.clipper(x_mid, y_mid, radius, differences, data):
                 background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
                 real_count = pixel_count - background * size
                 mag_i = -2.5 * np.log10(real_count)
@@ -99,9 +99,9 @@ class Analyzer:
         plt.ylabel('number of entries')
         plt.title('difference plot - find threshold')
 
-        print("Number of clipped galaxies = ", clip_counter)
+        print("Number of clipped galaxies = ", self.clip_counter)
 
-    def clipper(self, x_mid, y_mid, radius, differences, data, counter):
+    def clipper(self, x_mid, y_mid, radius, differences, data):
         # patches = np.load('clipper.npy')
         # circle = patches[0]
         # square = patches[1]
@@ -132,7 +132,7 @@ class Analyzer:
             return True
         else:
             print('cut galaxy has midpoints', x_mid, ',', y_mid, 'radius is', radius)
-            counter += 1
+            self.clip_counter += 1
             return False
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
