@@ -13,18 +13,20 @@ def radial_plot(galaxies_points, img):
                 brightestValue = brightness
                 brightestPoint = point
         print(brightestPoint, brightestValue)
+        print(midPointAlgorithm(img, brightestPoint, 1))
 
 
-def midPointAlgorithm(data, center, radius, value):
+def midPointAlgorithm(data, center, radius):
+    pixelCounts = []
     f = 1 - radius
     ddf_x = 1
     ddf_y = -2 * radius
     x = 0
     y = radius
-    data[center[0], center[1] + radius] = value
-    data[center[0], center[1] - radius] = value
-    data[center[0] + radius, center[1]] = value
-    data[center[0] - radius, center[1]] = value
+    pixelCounts.append(data[center[0], center[1] + radius])
+    pixelCounts.append(data[center[0], center[1] - radius])
+    pixelCounts.append(data[center[0] + radius, center[1]])
+    pixelCounts.append(data[center[0] - radius, center[1]])
 
     while x < y:
         if f >= 0:
@@ -34,15 +36,15 @@ def midPointAlgorithm(data, center, radius, value):
         x += 1
         ddf_x += 2
         f += ddf_x
-        data[center[0] + x, center[1] + y] = value
-        data[center[0] - x, center[1] + y] = value
-        data[center[0] + x, center[1] - y] = value
-        data[center[0] - x, center[1] - y] = value
-        data[center[0] + y, center[1] + x] = value
-        data[center[0] - y, center[1] + x] = value
-        data[center[0] + y, center[1] - x] = value
-        data[center[0] - y, center[1] - x] = value
-    return data
+        pixelCounts.append(data[center[0] + x, center[1] + y])
+        pixelCounts.append(data[center[0] - x, center[1] + y])
+        pixelCounts.append(data[center[0] + x, center[1] - y])
+        pixelCounts.append(data[center[0] - x, center[1] - y])
+        pixelCounts.append(data[center[0] + y, center[1] + x])
+        pixelCounts.append(data[center[0] - y, center[1] + x])
+        pixelCounts.append(data[center[0] + y, center[1] - x])
+        pixelCounts.append(data[center[0] - y, center[1] - x])
+    return pixelCounts
 
 
 if __name__ == '__main__':
@@ -51,9 +53,3 @@ if __name__ == '__main__':
     # print(img.shape)
     # print(len(galaxies_points))
     # radial_plot(galaxies_points, img)
-
-    data = np.zeros((40, 40))
-    data = midPointAlgorithm(data, [20, 20], 10, 1)
-    data = midPointAlgorithm(data, [20, 20], 15, 2)
-    plt.imshow(data, origin='lower')
-    plt.show()

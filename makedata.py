@@ -11,8 +11,10 @@ from matplotlib.colors import LogNorm
 # testData = pixelData[2240:2631, 1574:1790]  # bigger slice
 
 mData = fits.open('masked1.fits')[0].data
+orgData = fits.open('A1_mosaic.fits')[0].data
 print(mData.shape)
 np.save('realmaskedData', mData)
+np.save('realOrgData', orgData)
 
 fig, ax = plt.subplots()
 plt.imshow(mData, norm=LogNorm(), origin='lower')

@@ -14,7 +14,7 @@ class Analyzer:
         self.background = 3412  # mean of gaussian
         self.sigma = 20  # spread
         self.ZP = 25.3  # zeropoint ZP
-        self.sigma_num = 3
+        self.sigma_num = 4
         self.threshold = self.background + self.sigma_num * self.sigma
 
         self.galaxies_points = []
@@ -91,14 +91,17 @@ class Analyzer:
                 galaxy_dict = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
                                'total_count': pixel_count, 'background_count': background * size}
                 self.galaxies.append(galaxy_dict)
+            else:
+                for point in galaxy:
+                    self.digitalMap[point[0], point[1]] = 0
             if i % interval == 0:
                 print(f'Galaxy {i} out of {len(self.galaxies_points)}')
         # access differences here
-        fig, ax = plt.subplots()
-        plt.hist(differences, bins='auto')
-        plt.xlabel('difference in number of counts')
-        plt.ylabel('number of entries')
-        plt.title('difference plot - find threshold')
+        # fig, ax = plt.subplots()
+        # plt.hist(differences, bins='auto')
+        # plt.xlabel('difference in number of counts')
+        # plt.ylabel('number of entries')
+        # plt.title('difference plot - find threshold')
 
         print("Number of clipped galaxies = ", self.clip_counter)
 
@@ -134,7 +137,7 @@ class Analyzer:
         else:
             print('cut galaxy has midpoints', x_mid, ',', y_mid, 'radius is', radius)
             self.clip_counter += 1
-            return True
+            return False
 
     def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
@@ -171,7 +174,7 @@ class Analyzer:
 
     def floodFill(self, x, y):
         """Calculates points that are clustered together"""
-        size_threshold = 2
+        size_threshold = 4
         object = []  # list of points of one galaxy detected
         size = 0
         toFill = set()
@@ -229,7 +232,8 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
-    a.load('testData_noisy.npy', 'orgData_noisy.npy')
+    # a.load('testData_noisy.npy', 'orgtestData_noisy.npy')
+    a.load('realmaskedData.npy', 'realOrgData.npy')
     a.run()
     plt.show()
     # a.plotData()
