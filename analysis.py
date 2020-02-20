@@ -89,7 +89,7 @@ class Analyzer:
 
             # print(x_mid, y_mid)
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
-            if self.clipper(x_mid, y_mid, radius, differences, data) and self.asymmetry(x_min,x_max,y_min,y_max,brightestPoint[0],brightestPoint[1]):
+            if self.clipper(x_mid, y_mid, radius, differences, data) and self.asymmetry(x_min, x_max, y_min, y_max, brightestPoint[0], brightestPoint[1]):
                 background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
                 real_count = pixel_count - background * size
                 mag_i = -2.5 * np.log10(real_count)
@@ -103,25 +103,17 @@ class Analyzer:
             if i % interval == 0:
                 print(f'Galaxy {i} out of {len(self.galaxies_points)}')
         # access differences here
-<<<<<<< HEAD
         # fig, ax = plt.subplots()
         # plt.hist(differences, bins='auto')
         # plt.xlabel('difference in number of counts')
         # plt.ylabel('number of entries')
         # plt.title('difference plot - find threshold')
-=======
-        fig, ax = plt.subplots()
-        np.save('differences.npy', differences)
-        plt.hist(differences, bins=40)
-        plt.xlabel('difference in number of counts')
-        plt.ylabel('number of entries')
-        plt.title('difference plot - find threshold')
->>>>>>> pr/10
 
         print("Number of clipped galaxies = ", self.clip_counter)
 
     def asymmetry(self, x_min, x_max, y_min, y_max, bP0, bP1):
-        x_diff = abs((x_max-bP0)-(bP0-x_min)) #difference in the distance to brightest point from xmin and xmax\
+        x_diff = abs((x_max-bP0)-(bP0-x_min)
+                     )  # difference in the distance to brightest point from xmin and xmax\
         y_diff = abs((y_max-bP1)-(bP1-y_min))
 
         if y_diff > 5 or x_diff > 5:
@@ -256,12 +248,8 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
-<<<<<<< HEAD
     # a.load('testData_noisy.npy', 'orgtestData_noisy.npy')
     a.load('realmaskedData.npy', 'realOrgData.npy')
-=======
-    a.load('testData_noisy.npy', 'orgtestData_noisy.npy')
->>>>>>> pr/10
     a.run()
     plt.show()
     # a.plotData()
