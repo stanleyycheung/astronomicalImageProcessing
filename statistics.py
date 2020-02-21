@@ -14,6 +14,8 @@ for galaxy in galaxies:
 #         m_min = m
 #         m_min_pos = galaxy['pos']
     m_array.append(m)
+    if galaxy['avg_background'] > 3450:
+        print(galaxy)
 
 # img = np.load('realmaskedData.npy')
 # offset = 23.5
@@ -25,13 +27,10 @@ for galaxy in galaxies:
 lower = 20 #orange
 upper = 1300 #green dot - upper fit point, from the end
 
-sorted_m = np.sort(m_array)
-count = np.arange(1, len(sorted_m) + 1)
+sorted_m = np.sort(m_array)[1:]
+count = np.arange(1, len(sorted_m)+1)
+
 count = np.log10(count)
-
-print(sorted_m)
-
-#exit()
 
 plt.plot(sorted_m, count, 'x')
 plt.plot(sorted_m[lower], count[lower], 'o')
