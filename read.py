@@ -7,5 +7,5 @@ header = hdulist[0].header
 pprint(header['MAGZPT'])
 pprint(header['MAGZRR'])
 pixelData = hdulist[0].data
-
+exit()
 np.save('pixelData', pixelData)

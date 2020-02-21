@@ -22,8 +22,8 @@ for galaxy in galaxies:
 # plt.show()
 # exit()
 
-lower = 20
-upper = 1700
+lower = 20 #orange
+upper = 1300 #green dot - upper fit point, from the end
 
 sorted_m = np.sort(m_array)
 count = np.arange(1, len(sorted_m) + 1)
@@ -31,7 +31,7 @@ count = np.log10(count)
 
 print(sorted_m)
 
-exit()
+#exit()
 
 plt.plot(sorted_m, count, 'x')
 plt.plot(sorted_m[lower], count[lower], 'o')
