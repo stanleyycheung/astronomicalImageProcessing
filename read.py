@@ -8,4 +8,4 @@ pprint(header['MAGZPT'])
 pprint(header['MAGZRR'])
 pixelData = hdulist[0].data
 
-np.save('pixelData', pixelData)
+# np.save('pixelData', pixelData)
