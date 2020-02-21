@@ -17,6 +17,6 @@ np.save('realmaskedData', mData)
 np.save('realOrgData', orgData)
 
 fig, ax = plt.subplots()
-plt.imshow(mData, norm=LogNorm(), origin='lower')
+plt.imshow(orgData, norm=LogNorm(), origin='lower')
 plt.colorbar()
 plt.show()

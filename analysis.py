@@ -18,6 +18,7 @@ class Analyzer:
         self.threshold = self.background + self.sigma_num * self.sigma
 
         self.galaxies_points = []
+        self.filtered_galaxies_points = []
         self.galaxies = []
 
     def load(self, maskedDir, orgImgDir):
@@ -38,11 +39,13 @@ class Analyzer:
         t3 = time.process_time()
         print(f'Took {t3-t2:.2f}s to calculate galaxies')
         # pprint(self.galaxies)
-        print(f'No. of galaxies = {len(self.galaxies)}')
+        print(f'Final no. of galaxies = {len(self.galaxies)}')
+        print(f'Filtered out {len(self.galaxies_points)-len(self.galaxies)}')
         self.write()
         self.plotDigital()  # plot digital graph
         self.plotData(self.maskedImg)
         np.save('galaxies_points', self.galaxies_points)
+        np.save('filtered_galaxies_points', self.filtered_galaxies_points)
 
     def labelGalaxies(self, data):
         """Creates a digital map and clusters galaxies together
@@ -61,6 +64,7 @@ class Analyzer:
         interval = len(self.galaxies_points)//100
         differences = []
         self.clip_counter = 0
+        self.asymmetry_counter = 0
         for i, galaxy in enumerate(np.array(self.galaxies_points)):
             pixel_count = 0
             x_min, x_max = 1e9, 0
@@ -85,17 +89,18 @@ class Analyzer:
                     y_max = point[1]
                 size += 1
             x_mid, y_mid = (x_max + x_min)/2, (y_max + y_min)/2
-            radius = max((x_max-x_mid), (x_mid-x_min), (y_max-y_mid), (y_mid-y_min))
+            radius = max(abs(x_max-x_mid), abs(x_mid-x_min), abs(y_max-y_mid), abs(y_mid-y_min))
 
             # print(x_mid, y_mid)
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
             if self.clipper(x_mid, y_mid, radius, differences, data) and self.asymmetry(x_min, x_max, y_min, y_max, brightestPoint[0], brightestPoint[1]):
-                background = self.findBackground(x_mid, y_mid, 70, data, digitalMap)
+                self.filtered_galaxies_points.append(galaxy)
+                background = self.findBackground(x_mid, y_mid, 70, data, digitalMap, mode=1)
                 real_count = pixel_count - background * size
                 mag_i = -2.5 * np.log10(real_count)
                 m = self.ZP + mag_i
                 galaxy_dict = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
-                               'total_count': pixel_count, 'background_count': background * size}
+                               'total_count': pixel_count, 'avg_background': background}
                 self.galaxies.append(galaxy_dict)
             else:
                 for point in galaxy:
@@ -110,6 +115,7 @@ class Analyzer:
         # plt.title('difference plot - find threshold')
 
         print("Number of clipped galaxies = ", self.clip_counter)
+        print("Number of asymmetric galaxies = ", self.asymmetry_counter)
 
     def asymmetry(self, x_min, x_max, y_min, y_max, bP0, bP1):
         x_diff = abs((x_max-bP0)-(bP0-x_min)
@@ -117,6 +123,8 @@ class Analyzer:
         y_diff = abs((y_max-bP1)-(bP1-y_min))
 
         if y_diff > 5 or x_diff > 5:
+            print(f'asymmetric galaxy of xdiff : {x_diff}, ydiff : {y_diff}')
+            self.asymmetry_counter += 1
             return False
         else:
             return True
@@ -141,6 +149,8 @@ class Analyzer:
                     if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2:
                         orig_count.append(self.orgImg[row][column])
                         mask_count.append(data[row][column])
+                        if self.digitalMap[row][column] != 2:
+                            self.digitalMap[row][column] = 4
                         # print(row, column)
                 except IndexError:
                     pass
@@ -167,7 +177,8 @@ class Analyzer:
                 try:  # make circular aperture out of it
                     if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2 and (digitalMap[row][column] == 0 or digitalMap[row][column] == 3):
                         background_arr.append(data[row][column])
-                        digitalMap[row][column] = 3
+                        if digitalMap[row][column] != 4:
+                            digitalMap[row][column] = 3
                         # print(row, column)
                 except IndexError:
                     pass
@@ -177,20 +188,20 @@ class Analyzer:
             background = np.mean(background_arr)
             return background
         elif mode == 1:
-            fig, ax = plt.subplots()
-            plt.hist(background_arr, bins='auto')
-            xt = plt.xticks()[0]
-            xmin, xmax = min(xt), max(xt)
-            lnspc = np.linspace(xmin, xmax, len(background_arr))
+            # fig, ax = plt.subplots()
+            # plt.hist(background_arr, bins='auto')
+            # xt = plt.xticks()[0]
+            # xmin, xmax = min(xt), max(xt)
+            # lnspc = np.linspace(xmin, xmax, len(background_arr))
             m, s = stats.norm.fit(background_arr)  # get mean and standard deviation
-            print(m, s)
-            pdf_g = stats.norm.pdf(lnspc, m, s)  # now get theoretical values in our interval
-            plt.plot(lnspc, pdf_g, label=f"Norm, mean = {m:.2f}")
+            # print(m, s)
+            # pdf_g = stats.norm.pdf(lnspc, m, s)  # now get theoretical values in our interval
+            # plt.plot(lnspc, pdf_g, label=f"Norm, mean = {m:.2f}")
             return m
 
     def floodFill(self, x, y):
         """Calculates points that are clustered together"""
-        size_threshold = 4
+        size_threshold = 8
         object = []  # list of points of one galaxy detected
         size = 0
         toFill = set()
@@ -234,11 +245,9 @@ class Analyzer:
 
     def plotDigital(self):
         fig, ax = plt.subplots()
-        cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow'])
+        cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow', 'green'])
         plt.imshow(self.digitalMap, cmap=cmap, origin='lower')
-
-        # plt.hist(data)
-        # plt.show()
+        np.save('digitalMap', self.digitalMap)
 
     def plotData(self, data):
         fig, ax = plt.subplots()
