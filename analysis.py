@@ -14,7 +14,7 @@ class Analyzer:
         self.background = 3412  # mean of gaussian
         self.sigma = 20  # spread
         self.ZP = 25.3  # zeropoint ZP
-        self.sigma_num = 4
+        self.sigma_num = 2.5
         self.threshold = self.background + self.sigma_num * self.sigma
 
         self.galaxies_points = []
@@ -35,7 +35,7 @@ class Analyzer:
         self.labelGalaxies(self.maskedImg)
         t2 = time.process_time()
         print(f'Took {t2-t1:.2f}s to label galaxies')
-        self.calcGalaxies(self.maskedImg)  # digital map: creating catalog
+        self.calcGalaxies(self.maskedImg, self.digitalMap)  # digital map: creating catalog
         t3 = time.process_time()
         print(f'Took {t3-t2:.2f}s to calculate galaxies')
         # pprint(self.galaxies)
@@ -59,7 +59,7 @@ class Analyzer:
                 if self.digitalMap[i, j] == 1:
                     self.floodFill(i, j)
 
-    def calcGalaxies(self, data):
+    def calcGalaxies(self, data, digitalMap):
         """Calculates the fluxes from galaxy_points"""
         interval = len(self.galaxies_points)//100
         differences = []
@@ -95,9 +95,8 @@ class Analyzer:
             # self.findBackground(x_mid, y_mid, (x_max - x_min)/2 * 10, data)
             if self.clipper(x_mid, y_mid, radius, differences, data) and self.asymmetry(x_min, x_max, y_min, y_max, brightestPoint[0], brightestPoint[1]):
                 self.filtered_galaxies_points.append(galaxy)
-                background = self.findBackground(x_mid, y_mid, 70, data, mode=1)
+                background = self.findBackground(x_mid, y_mid, 70, data, digitalMap, mode=1)
                 real_count = pixel_count - background * size
-                print(real_count, pixel_count, background, size)
                 mag_i = -2.5 * np.log10(real_count)
                 m = self.ZP + mag_i
                 galaxy_dict = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
@@ -105,7 +104,7 @@ class Analyzer:
                 self.galaxies.append(galaxy_dict)
             else:
                 for point in galaxy:
-                    self.digitalMap[point[0], point[1]] = 5
+                    self.digitalMap[point[0], point[1]] = 0
             if i % interval == 0:
                 print(f'Galaxy {i} out of {len(self.galaxies_points)}')
         # access differences here
@@ -166,7 +165,7 @@ class Analyzer:
             self.clip_counter += 1
             return False
 
-    def findBackground(self, x_mid, y_mid, radius, data, mode=0):
+    def findBackground(self, x_mid, y_mid, radius, data, digitalMap, mode=0):
         """Finds the background value by drawing a big circle around star"""
         xlower = max(int(x_mid - radius), 0)
         xhigher = max(int(x_mid + radius), 0)
@@ -176,12 +175,10 @@ class Analyzer:
         for row in range(xlower, xhigher + 1, 1):
             for column in range(ylower, yhigher + 1, 1):
                 try:  # make circular aperture out of it
-                    if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2 and data[row][column] < self.threshold:
+                    if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2 and (digitalMap[row][column] == 0 or digitalMap[row][column] == 3):
                         background_arr.append(data[row][column])
-                        if data[row][column] > self.threshold:
-                            print(data[row][column])
-                        if self.digitalMap[row][column] != 4:
-                            self.digitalMap[row][column] = 3
+                        if digitalMap[row][column] != 4:
+                            digitalMap[row][column] = 3
                         # print(row, column)
                 except IndexError:
                     pass
@@ -191,22 +188,20 @@ class Analyzer:
             background = np.mean(background_arr)
             return background
         elif mode == 1:
+            # fig, ax = plt.subplots()
+            # plt.hist(background_arr, bins='auto')
+            # xt = plt.xticks()[0]
+            # xmin, xmax = min(xt), max(xt)
+            # lnspc = np.linspace(xmin, xmax, len(background_arr))
             m, s = stats.norm.fit(background_arr)  # get mean and standard deviation
-            if m > 3700:
-                fig, ax = plt.subplots()
-                plt.hist(background_arr, bins='auto')
-                xt = plt.xticks()[0]
-                xmin, xmax = min(xt), max(xt)
-                lnspc = np.linspace(xmin, xmax, len(background_arr))
-
-                print(m, s)
-                pdf_g = stats.norm.pdf(lnspc, m, s)  # now get theoretical values in our interval
-                plt.plot(lnspc, pdf_g, label=f"Norm, mean = {m:.2f}")
+            # print(m, s)
+            # pdf_g = stats.norm.pdf(lnspc, m, s)  # now get theoretical values in our interval
+            # plt.plot(lnspc, pdf_g, label=f"Norm, mean = {m:.2f}")
             return m
 
     def floodFill(self, x, y):
         """Calculates points that are clustered together"""
-        size_threshold = 8
+        size_threshold = 13
         object = []  # list of points of one galaxy detected
         size = 0
         toFill = set()
@@ -242,7 +237,7 @@ class Analyzer:
             self.galaxies_points.append(object)  # arrays in array: list of objects
         else:
             for x, y in object:
-                self.digitalMap[x, y] = 5
+                self.digitalMap[x, y] = 0
 
     def write(self):
         with open('galaxies.json', 'w') as fout:
@@ -250,7 +245,9 @@ class Analyzer:
 
     def plotDigital(self):
         fig, ax = plt.subplots()
-        cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow', 'green', 'blue'])
+        cmap = colors.ListedColormap(['black', 'white', 'red', 'yellow', 'green'])
+        #black - background, white - above threshold, red - grouped galaxy points,
+        #yellow - aperture(background), green - clipper, blue - the rejected galaxies
         plt.imshow(self.digitalMap, cmap=cmap, origin='lower')
         np.save('digitalMap', self.digitalMap)
 

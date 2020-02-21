@@ -25,10 +25,11 @@ for galaxy in galaxies:
 # exit()
 
 lower = 20 #orange
-upper = 1300 #green dot - upper fit point, from the end
+upper = 2200 #green dot - upper fit point, from the end
 
 sorted_m = np.sort(m_array)[1:]
 count = np.arange(1, len(sorted_m)+1)
+print(count)
 
 count = np.log10(count)
 
