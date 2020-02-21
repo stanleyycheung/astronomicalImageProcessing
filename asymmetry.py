@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
 galaxies_points = np.load('galaxies_points.npy',allow_pickle=True)
-img = np.load('testData_noisy.npy')
-#print(galaxies_points)
+img = np.load('realmaskedData.npy')
+print(len(galaxies_points))
 
 x_resid = []
 y_resid = []

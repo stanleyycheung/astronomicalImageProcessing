@@ -228,11 +228,11 @@ class Processor:
 if __name__ == '__main__':
     p = Processor()
     # p.starsExclude()
-    p.createMask()
+    # p.createMask()
     # p.readMask()
     # p.fitBackground(p.imgMasked)
     # p.plotBackground(p.imgMasked)
-    # p.plotBackground(p.img)
+    p.plotBackground(p.img)
     plt.show()
 
     # for i in np.linspace(0, len(p.img)-1, num=10):

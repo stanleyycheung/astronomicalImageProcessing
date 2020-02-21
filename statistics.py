@@ -33,6 +33,7 @@ sorted_m = np.sort(m_array)[1:]
 count = np.arange(1, len(sorted_m)+1)
 count_err = np.sqrt(count)
 
+
 count_err = 1/count * count_err
 count = np.log10(count)
 
