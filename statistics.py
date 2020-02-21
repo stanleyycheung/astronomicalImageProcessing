@@ -10,10 +10,12 @@ m_array = []
 # m_min_pos = [0, 0]
 for galaxy in galaxies:
     m = galaxy['m']
+    # real_count = galaxy['real_count']
 #     if m < m_min:
 #         m_min = m
 #         m_min_pos = galaxy['pos']
     m_array.append(m)
+    # m_array.append(25.3-2.5 * np.log10(real_count))
     if galaxy['avg_background'] > 3450:
         print(galaxy)
 
@@ -24,29 +26,30 @@ for galaxy in galaxies:
 # plt.show()
 # exit()
 
-lower = 20
-upper = 1500
+lower = 10
+upper = 2300
 
 sorted_m = np.sort(m_array)[1:]
 count = np.arange(1, len(sorted_m)+1)
+count_err = np.sqrt(count)
 
+count_err = 1/count * count_err
 count = np.log10(count)
 
+# plt.errorbar(sorted_m, count, fmt='x', yerr=count_err, capsize=3)
 plt.plot(sorted_m, count, 'x')
-plt.plot(sorted_m[lower], count[lower], 'o')
-plt.plot(sorted_m[-upper], count[-upper], 'o')
 
 fit_m = sorted_m[lower:-upper]
 fit_count = count[lower:-upper]
 
-z, cov = np.polyfit(fit_m, fit_count, 1, cov=True)
+z, cov = np.polyfit(fit_m, fit_count, 1, cov=True, w=1/count_err[lower:-upper])
 p = np.poly1d(z)
 
+print(z, cov[0][0])
 
-print(z)
 plt.plot(sorted_m, p(sorted_m))
-
-
+plt.plot(sorted_m[lower], count[lower], 'o')
+plt.plot(sorted_m[-upper], count[-upper], 'o')
 # plt.yscale('log')
 
 plt.xlabel('m')

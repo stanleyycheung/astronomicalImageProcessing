@@ -14,7 +14,7 @@ class Analyzer:
         self.background = 3412  # mean of gaussian
         self.sigma = 20  # spread
         self.ZP = 25.3  # zeropoint ZP
-        self.sigma_num = 4
+        self.sigma_num = 3
         self.threshold = self.background + self.sigma_num * self.sigma
 
         self.galaxies_points = []
@@ -67,6 +67,7 @@ class Analyzer:
         self.asymmetry_counter = 0
         for i, galaxy in enumerate(np.array(self.galaxies_points)):
             pixel_count = 0
+            pixel_count_arr = []
             x_min, x_max = 1e9, 0
             y_min, y_max = 1e9, 0
             size = 0
@@ -74,7 +75,9 @@ class Analyzer:
             brightestPoint = [0, 0]
             for point in galaxy:
                 # print(point, data[point[0], point[1]])
-                pixel_count += data[point[0], point[1]]  # each are x and y coordinate of the point
+                # each are x and y coordinate of the point
+                pixel_count += self.maskedImg[point[0], point[1]]
+                pixel_count_arr.append(self.maskedImg[point[0], point[1]])
                 brightness = data[point[0], point[1]]
                 if brightness > brightestValue:
                     brightestValue = brightness
@@ -97,7 +100,7 @@ class Analyzer:
                 self.filtered_galaxies_points.append(galaxy)
                 background = self.findBackground(x_mid, y_mid, 70, data, mode=1)
                 real_count = pixel_count - background * size
-                print(real_count, pixel_count, background, size)
+                # print(real_count, pixel_count, background, size)
                 mag_i = -2.5 * np.log10(real_count)
                 m = self.ZP + mag_i
                 galaxy_dict = {'pos': (x_mid, y_mid), 'm': m, 'size': size, 'real_count': real_count,
@@ -150,7 +153,7 @@ class Analyzer:
                     if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2:
                         orig_count.append(self.orgImg[row][column])
                         mask_count.append(data[row][column])
-                        if self.digitalMap[row][column] != 2:
+                        if self.digitalMap[row][column] != 2 or self.digitalMap[row][column] != 5:
                             self.digitalMap[row][column] = 4
                         # print(row, column)
                 except IndexError:
@@ -206,7 +209,7 @@ class Analyzer:
 
     def floodFill(self, x, y):
         """Calculates points that are clustered together"""
-        size_threshold = 8
+        size_threshold = 7
         object = []  # list of points of one galaxy detected
         size = 0
         toFill = set()
