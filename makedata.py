@@ -13,6 +13,7 @@ from matplotlib.colors import LogNorm
 mData = fits.open('masked1.fits')[0].data
 orgData = fits.open('A1_mosaic.fits')[0].data
 print(mData.shape)
+exit()
 np.save('realmaskedData', mData)
 np.save('realOrgData', orgData)
 

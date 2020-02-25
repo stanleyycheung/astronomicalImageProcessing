@@ -1,19 +1,45 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 from scipy.optimize import curve_fit
+from scipy.signal import savgol_filter
 
 
 def radial_plot(galaxies_points, img):
-    for galaxy in [galaxies_points[0]]:
+    for i in range(100, 200):
+        galaxy = galaxies_points[i]
         brightestValue = 0
         brightestPoint = [0, 0]
+        x_min, x_max = 1e9, 0
+        y_min, y_max = 1e9, 0
         for point in galaxy:
             brightness = img[point[0], point[1]]
+            if point[0] < x_min:
+                x_min = point[0]
+            elif point[0] > x_max:
+                x_max = point[0]
+            if point[1] < y_min:
+                y_min = point[1]
+            elif point[1] > y_max:
+                y_max = point[1]
             if brightness > brightestValue:
                 brightestValue = brightness
                 brightestPoint = point
-        print(brightestPoint, brightestValue)
-        print(midPointAlgorithm(img, brightestPoint, 1))
+        # print(brightestPoint, brightestValue)
+        # print(midPointAlgorithm(img, brightestPoint, 1))
+        # print(midPointAlgorithm(img, brightestPoint, 2))
+        radial_brightness = [brightestValue]
+        for i in range(1, 11):
+            radial_brightness.append(midPointAlgorithm(img, brightestPoint, i))
+        r_plot = np.arange(0, 11)
+        smoothed_radial_brightness = savgol_filter(radial_brightness, 7, 3)
+
+        if sorted(np.diff(smoothed_radial_brightness))[-1] > 5:
+            fig, ax = plt.subplots()
+            plt.plot(r_plot, radial_brightness, '-')
+            plt.plot(r_plot, smoothed_radial_brightness, 'o-')
+            fig, ax = plt.subplots()
+            plt.imshow(img[x_min:x_max+1, y_min:y_max+1], origin='upper', norm=LogNorm())
 
 
 def midPointAlgorithm(data, center, radius):
@@ -44,12 +70,13 @@ def midPointAlgorithm(data, center, radius):
         pixelCounts.append(data[center[0] - y, center[1] + x])
         pixelCounts.append(data[center[0] + y, center[1] - x])
         pixelCounts.append(data[center[0] - y, center[1] - x])
-    return pixelCounts
+    return np.average(pixelCounts)
 
 
 if __name__ == '__main__':
-    img = np.load('testData_noisy.npy')
-    galaxies_points = np.load('galaxies_points.npy', allow_pickle=True)
+    img = np.load('realmaskedData.npy')
+    galaxies_points = np.load('filtered_galaxies_points.npy', allow_pickle=True)
     # print(img.shape)
     # print(len(galaxies_points))
-    # radial_plot(galaxies_points, img)
+    radial_plot(galaxies_points, img)
+    plt.show()

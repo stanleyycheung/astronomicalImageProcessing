@@ -30,6 +30,7 @@ class Processor:
         xupper = 3550
         # xlower, xupper = 3400, 3440
         background = [i for i in data.flatten() if xlower <= i <= xupper]
+        np.save('background_whole', background)
         plt.hist(background, bins=3550-3340+1, density=True)
 
         print(np.mean(background))
@@ -80,7 +81,6 @@ class Processor:
         return self.mask
 
     def greyAreaExclude(self, i, j):
-        # need to modify
         if self.img[i][j] == 3421:
             try:
                 if self.img[i][j + 1] == 3421 and self.img[i + 1][j] == 3421 and self.img[i - 1][j] == 3421 and self.img[i][j - 1] == 3421:
@@ -111,8 +111,6 @@ class Processor:
         threshold = 30000
         try:
             if self.img[i][j+1]-self.img[i][j] > threshold:
-                # print(i, j)
-
                 pass
         except IndexError:
             pass
@@ -158,7 +156,6 @@ class Processor:
         for patch in circle:
             # print(patch[0],patch[1])
             excluder_circle(patch[0], patch[1])
-
         for patch in square:
             excluder(patch[0], patch[1], patch[2], patch[3])
             # print(patch[0],patch[1],patch[2],patch[3])

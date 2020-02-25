@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-
-galaxies_points = np.load('galaxies_points.npy',allow_pickle=True)
+plt.rcParams.update({'font.size': 14})
+galaxies_points = np.load('galaxies_points.npy', allow_pickle=True)
 img = np.load('realmaskedData.npy')
 print(len(galaxies_points))
 
@@ -30,7 +30,8 @@ for galaxy in galaxies_points:
     x_mid, y_mid = (x_max + x_min)/2, (y_max + y_min)/2
     # radius = max((x_max-x_mid), (x_mid-x_min), (y_max-y_mid), (y_mid-y_min))
 
-    x_diff = abs((x_max-brightestPoint[0])-(brightestPoint[0]-x_min)) #difference in the distance to brightest point from xmin and xmax\
+    x_diff = abs((x_max-brightestPoint[0])-(brightestPoint[0]-x_min)
+                 )  # difference in the distance to brightest point from xmin and xmax\
     y_diff = abs((y_max-brightestPoint[1])-(brightestPoint[1]-y_min))
 
     # #for later in the calc galaxies
@@ -48,18 +49,23 @@ for galaxy in galaxies_points:
     #     plt.imshow(img[x_min:x_max, y_min:y_max], norm=LogNorm())
 
     if y_diff > 5 or x_diff > 5:
+        continue
         print(x_min, x_max)
         print(y_min, y_max)
         print(x_mid, y_mid)
-        fig,ax = plt.subplots()
+        fig, ax = plt.subplots()
         plt.imshow(img[x_min:x_max, y_min:y_max], norm=LogNorm())
 
 # print('x diff are', x_resid)
 # print('y diff are', y_resid)
 
-fig,ax = plt.subplots()
-plt.hist(y_resid, bins ='auto')
-plt.title("difference in y distances")
-plt.xlabel("difference in pixel length")
-plt.ylabel("number of counts")
+fig, ax = plt.subplots()
+plt.hist([y_resid, x_resid], bins=25, label=[r'x-axis', r'y-axis'])
+# plt.title("difference in y distances")
+plt.xlabel(r"Distance difference from brightest pixel")
+plt.ylabel("No. of galaxies")
+plt.xticks(np.arange(0, 55, step=5))
+plt.legend()
+plt.tight_layout()
+plt.savefig('fig/asymmetry.pdf')
 plt.show()

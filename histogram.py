@@ -8,6 +8,6 @@ differences = np.load('differences.npy')
 #     if differences[i] <200:
 #         lowrangeplot.append(differences[i])
 
-plt.hist([i for i in differences if i <= 250000], bins= 200)
+plt.hist([i for i in differences if i <= 250000], bins=200)
 #plt.hist(differences, bins = 100)
 plt.show()

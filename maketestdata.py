@@ -14,10 +14,17 @@ mData = fits.open('masked1.fits')[0].data
 orgWindow = fits.open('A1_mosaic.fits')[0].data
 print(mData.shape)
 testData = mData[3400:4604, 4:1500]
+testData = mData[3400:4004, 4:750]
+
 # orgData = orgWindow[3400:4604, 4:1500]
-np.save('testData_noisy', testData)
+# np.save('testData_noisy', testData)
 # np.save('orgData_noisy', orgData)
 
+hdu = fits.PrimaryHDU(testData)
+hdul = fits.HDUList([hdu])
+hdul.writeto('forplot.fits')
+
+exit()
 fig, ax = plt.subplots()
 plt.imshow(testData, norm=LogNorm(), origin='lower')
 plt.colorbar()
