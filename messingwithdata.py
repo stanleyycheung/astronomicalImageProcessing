@@ -43,7 +43,7 @@ for i in range(len(count_err)):
         count_err_new[1].append(count_err[i])
 
 # plt.plot(m_plot, np.log10(count), 'x')
-plt.errorbar(m_plot, count, fmt='x', yerr=count_err_new, capsize=3)
+plt.errorbar(m_plot, count, fmt='x', yerr=count_err_new, capsize=3, zorder=1)
 lower = 8
 upper = 26
 fit_m = m_plot[lower:-upper]
@@ -53,10 +53,10 @@ p = np.poly1d(z)
 
 print(z, cov[0][0])
 plt.errorbar(m_plot[-upper], count[-upper], fmt='x',
-             yerr=count_err[-upper], capsize=3, color='red')
+             yerr=count_err[-upper], capsize=3, color='red', zorder=2)
 plt.errorbar(m_plot[lower], count[lower], fmt='x',
-             yerr=count_err[lower], capsize=3, color='red')
-plt.plot(m_plot, p(m_plot))
+             yerr=count_err[lower], capsize=3, color='red', zorder=2)
+plt.plot(m_plot[:45], p(m_plot[:45]), zorder=3)
 plt.xlabel('m')
 plt.ylabel(r"$\log N(m)$")
 plt.grid()

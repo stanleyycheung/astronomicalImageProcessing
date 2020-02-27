@@ -46,8 +46,8 @@ class Analyzer:
         print(f'Final no. of galaxies = {len(self.galaxies)}')
         print(f'Filtered out {len(self.galaxies_points)-len(self.galaxies)}')
         self.write()
-        # self.plotTool(['black', 'white', 'red', 'yellow', 'cyan'], 'fig/background.pdf')
-        # self.plotTool(['black', 'white', 'red', 'yellow', 'green', 'cyan'], 'fig/map.pdf')
+        # self.plotTool(['black', 'white', 'red', 'cyan', 'cyan'], 'fig/background.pdf')
+        self.plotTool(['black', 'white', 'red', 'yellow', 'green', 'cyan'], 'fig/map.pdf')
 
         self.plotDigital()  # plot digital graph
         self.plotData(self.maskedImg)
@@ -160,8 +160,8 @@ class Analyzer:
                     if radius ** 2 > (row-x_mid)**2 + (column-y_mid)**2:
                         orig_count.append(self.orgImg[row][column])
                         mask_count.append(data[row][column])
-                        if self.digitalMap[row][column] != 2 and self.digitalMap[row][column] != 5:
-                            self.digitalMap[row][column] = 4
+                        # if self.digitalMap[row][column] != 2 and self.digitalMap[row][column] != 5:
+                        #     self.digitalMap[row][column] = 4
                 except IndexError:
                     pass
         orig_tot = np.sum(orig_count)
@@ -283,8 +283,8 @@ class Analyzer:
 
 if __name__ == '__main__':
     a = Analyzer()
-    # a.load('testData_noisy.npy', 'orgtestData_noisy.npy')
-    a.load('realmaskedData.npy', 'realOrgData.npy')
+    a.load('testData_noisy.npy', 'orgtestData_noisy.npy')
+    # a.load('realmaskedData.npy', 'realOrgData.npy')
     a.run()
     plt.show()
     # a.plotData()
